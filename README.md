@@ -44,9 +44,9 @@ graph TD
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework:** React/Next.js of Electron (te bepalen)
+- **Framework:** Next.js 14 with App Router
 - **UI Library:** Tailwind CSS + Shadcn/ui
-- **State Management:** Zustand of Redux Toolkit
+- **State Management:** Zustand with persistence
 - **Theming:** Custom theme engine met dark/light mode
 
 ### Backend & Integration
@@ -64,15 +64,15 @@ graph TD
 
 ## 📊 Project Status
 
-🚧 **Status:** Early Development / Concept Phase
+✅ **Status:** Phase 1 Complete - Foundation Ready
 
 ### Roadmap
 
-#### Phase 1: Foundation (Q1 2025)
-- [ ] Setup project architectuur
-- [ ] Implementeer basis UI framework
-- [ ] Ontwikkel eerste MCP-connector (Slack)
-- [ ] Basis authenticatie systeem
+#### Phase 1: Foundation (Q1 2025) ✅
+- [x] Setup project architectuur
+- [x] Implementeer basis UI framework
+- [x] Ontwikkel eerste MCP-connector (Slack)
+- [x] Basis authenticatie systeem
 
 #### Phase 2: Core Features (Q2 2025)
 - [ ] Outlook & Teams MCP-connectoren
@@ -109,8 +109,6 @@ Om met dit project te werken heb je nodig:
 
 ### Installatie
 
-> **Note:** Dit project is nog in de concept fase. Onderstaande instructies zijn voorbereid voor toekomstige implementatie.
-
 ```bash
 # Clone de repository
 git clone https://github.com/Xiliath/OneUIToConnectThemAll.git
@@ -125,21 +123,116 @@ cp .env.example .env
 # Configureer je API keys in .env
 # SLACK_CLIENT_ID=your_slack_client_id
 # SLACK_CLIENT_SECRET=your_slack_client_secret
-# MICROSOFT_CLIENT_ID=your_microsoft_client_id
-# MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret
-# CLAUDE_API_KEY=your_claude_api_key
+# SLACK_SIGNING_SECRET=your_slack_signing_secret
+# SLACK_REDIRECT_URI=http://localhost:3000/api/auth/slack/callback
+# NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Start development server
 npm run dev
+```
+
+De applicatie is nu beschikbaar op [http://localhost:3000](http://localhost:3000)
+
+### Slack App Setup
+
+Om Slack te integreren heb je een Slack App nodig:
+
+1. Ga naar [https://api.slack.com/apps](https://api.slack.com/apps)
+2. Klik op "Create New App" en kies "From scratch"
+3. Geef je app een naam en selecteer je workspace
+4. Ga naar "OAuth & Permissions" en voeg deze scopes toe:
+   - `channels:history`
+   - `channels:read`
+   - `chat:write`
+   - `users:read`
+   - `groups:read`
+   - `groups:history`
+5. Voeg de redirect URL toe: `http://localhost:3000/api/auth/slack/callback`
+6. Kopieer je Client ID en Client Secret naar je `.env` bestand
+7. Installeer de app in je workspace
+
+### Project Structuur
+
+```
+OneUIToConnectThemAll/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   │   └── auth/         # OAuth handlers
+│   ├── dashboard/        # Dashboard page
+│   ├── globals.css       # Global styles
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Home page
+├── components/            # React components
+│   ├── ui/               # UI components (Button, Card, etc.)
+│   ├── message-list.tsx  # Message display
+│   └── sidebar.tsx       # Channel sidebar
+├── lib/                   # Utilities
+│   ├── store.ts          # Zustand state management
+│   └── utils.ts          # Helper functions
+├── services/              # Business logic
+│   ├── auth/             # OAuth service
+│   └── mcp/              # MCP connectors
+├── types/                 # TypeScript types
+│   └── index.ts          # Type definitions
+└── __tests__/            # Jest tests
 ```
 
 ---
 
 ## 💡 Usage
 
-> **Note:** Gebruik voorbeelden worden toegevoegd zodra de eerste implementatie gereed is.
+### Phase 1 Features
 
-### Geplande functionaliteit:
+**Slack Integration:**
+1. Start de development server met `npm run dev`
+2. Ga naar [http://localhost:3000](http://localhost:3000)
+3. Klik op "Go to Dashboard"
+4. Klik op "Connect Slack"
+5. Autoriseer de app in je Slack workspace
+6. Bekijk je channels en berichten in de unified interface
+
+### Development
+
+```bash
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Lint code
+npm run lint
+```
+
+### Gebruik van de MCP Connectors
+
+```typescript
+import { slackConnector } from '@/services/mcp'
+
+// Connect to Slack
+slackConnector.setAccessToken('your-access-token')
+await slackConnector.connect()
+
+// Get channels
+const channels = await slackConnector.getChannels()
+
+// Get messages
+const messages = await slackConnector.getMessages('channel-id', 50)
+
+// Send message
+const newMessage = await slackConnector.sendMessage('channel-id', 'Hello!')
+```
+
+### Geplande functionaliteit (Phase 2+):
 
 ```javascript
 // Voorbeeld: Berichten ophalen van alle platforms
