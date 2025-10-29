@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Slack, Hash, Lock } from 'lucide-react'
 import type { Channel } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -19,16 +18,6 @@ export function Sidebar({
   onChannelSelect,
   onConnectSlack,
 }: SidebarProps) {
-  const [hasSlackToken, setHasSlackToken] = useState(false)
-
-  useEffect(() => {
-    // Check if user is connected to Slack
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('success') === 'slack_connected') {
-      setHasSlackToken(true)
-    }
-  }, [])
-
   return (
     <div className="w-64 bg-card border-r border-border h-full flex flex-col">
       <div className="p-4 border-b border-border">
@@ -36,7 +25,7 @@ export function Sidebar({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {!hasSlackToken && channels.length === 0 ? (
+        {channels.length === 0 ? (
           <div className="p-4">
             <p className="text-sm text-muted-foreground mb-4">
               Connect to Slack to view your channels

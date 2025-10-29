@@ -11,55 +11,46 @@ export default function DashboardPage() {
   const router = useRouter()
   const [channels, setChannels] = useState<Channel[]>([])
   const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { selectedChannel, setSelectedChannel } = useStore()
 
   useEffect(() => {
     // Check for OAuth success/error messages
     const urlParams = new URLSearchParams(window.location.search)
     const success = urlParams.get('success')
-    const error = urlParams.get('error')
+    const errorParam = urlParams.get('error')
 
     if (success === 'slack_connected') {
       // Fetch channels after successful connection
       fetchChannels()
     }
 
-    if (error) {
-      console.error('OAuth error:', error)
-      // TODO: Show error toast
+    if (errorParam) {
+      console.error('OAuth error:', errorParam)
+      setError(`Authentication failed: ${errorParam}`)
     }
   }, [])
 
   const fetchChannels = async () => {
     try {
-      // In a real implementation, this would call the API
-      // For now, we'll show some example channels
-      const exampleChannels: Channel[] = [
-        {
-          id: 'C1234567890',
-          name: 'general',
-          platform: 'slack',
-          unreadCount: 5,
-          isPrivate: false,
-        },
-        {
-          id: 'C0987654321',
-          name: 'random',
-          platform: 'slack',
-          unreadCount: 0,
-          isPrivate: false,
-        },
-        {
-          id: 'C1111111111',
-          name: 'dev-team',
-          platform: 'slack',
-          unreadCount: 12,
-          isPrivate: true,
-        },
-      ]
-      setChannels(exampleChannels)
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetch('/api/slack/channels')
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to fetch channels')
+      }
+
+      const data = await response.json()
+      setChannels(data.channels)
     } catch (error) {
       console.error('Failed to fetch channels:', error)
+      setError(error instanceof Error ? error.message : 'Failed to fetch channels')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -67,53 +58,23 @@ export default function DashboardPage() {
     setSelectedChannel(channel)
 
     try {
-      // In a real implementation, this would call the API to fetch messages
-      // For now, we'll show some example messages
-      const exampleMessages: Message[] = [
-        {
-          id: '1',
-          platform: 'slack',
-          content: 'Welcome to the channel!',
-          author: {
-            id: 'U1234567890',
-            name: 'John Doe',
-          },
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-          channelId: channel.id,
-          channelName: channel.name,
-        },
-        {
-          id: '2',
-          platform: 'slack',
-          content: 'Has anyone seen the latest update?',
-          author: {
-            id: 'U0987654321',
-            name: 'Jane Smith',
-          },
-          timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-          channelId: channel.id,
-          channelName: channel.name,
-          reactions: [
-            { emoji: '👍', count: 3, users: ['U1', 'U2', 'U3'] },
-            { emoji: '👀', count: 1, users: ['U4'] },
-          ],
-        },
-        {
-          id: '3',
-          platform: 'slack',
-          content: 'Yes! It looks great. The new features are working perfectly.',
-          author: {
-            id: 'U1111111111',
-            name: 'Bob Johnson',
-          },
-          timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-          channelId: channel.id,
-          channelName: channel.name,
-        },
-      ]
-      setMessages(exampleMessages)
+      setIsLoading(true)
+      setError(null)
+
+      const response = await fetch(`/api/slack/messages?channelId=${channel.id}&limit=50`)
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to fetch messages')
+      }
+
+      const data = await response.json()
+      setMessages(data.messages)
     } catch (error) {
       console.error('Failed to fetch messages:', error)
+      setError(error instanceof Error ? error.message : 'Failed to fetch messages')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -147,6 +108,9 @@ export default function DashboardPage() {
               )}
             </div>
             <div className="flex items-center space-x-2">
+              {isLoading && (
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              )}
               <span className="text-sm text-muted-foreground">
                 Phase 1: Foundation
               </span>
@@ -154,8 +118,22 @@ export default function DashboardPage() {
           </div>
         </header>
         <div className="flex-1 overflow-y-auto">
+          {error && (
+            <div className="p-4 bg-destructive/10 border-l-4 border-destructive text-destructive m-4">
+              <p className="font-semibold">Error</p>
+              <p className="text-sm">{error}</p>
+            </div>
+          )}
           {selectedChannel ? (
-            <MessageList messages={messages} />
+            isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <p className="text-muted-foreground">Loading messages...</p>
+                </div>
+              </div>
+            ) : (
+              <MessageList messages={messages} />
+            )
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
