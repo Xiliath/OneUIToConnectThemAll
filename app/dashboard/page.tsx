@@ -13,9 +13,13 @@ export default function DashboardPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const { selectedChannel, setSelectedChannel } = useStore()
 
   useEffect(() => {
+    // Check authentication status on mount
+    checkAuthStatus()
+
     // Check for OAuth success/error messages
     const urlParams = new URLSearchParams(window.location.search)
     const success = urlParams.get('success')
@@ -23,7 +27,10 @@ export default function DashboardPage() {
 
     if (success === 'slack_connected') {
       // Fetch channels after successful connection
+      setIsAuthenticated(true)
       fetchChannels()
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard')
     }
 
     if (errorParam) {
@@ -31,6 +38,24 @@ export default function DashboardPage() {
       setError(`Authentication failed: ${errorParam}`)
     }
   }, [])
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch('/api/slack/status')
+      const data = await response.json()
+
+      if (data.isAuthenticated) {
+        setIsAuthenticated(true)
+        // Automatically fetch channels if authenticated
+        fetchChannels()
+      } else {
+        setIsAuthenticated(false)
+      }
+    } catch (error) {
+      console.error('Failed to check auth status:', error)
+      setIsAuthenticated(false)
+    }
+  }
 
   const fetchChannels = async () => {
     try {
