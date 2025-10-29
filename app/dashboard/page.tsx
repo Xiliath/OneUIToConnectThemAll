@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { UnifiedMessaging } from '@/components/unified-messaging'
 import { useStore } from '@/lib/store'
-import type { Channel, Message, Platform } from '@/types'
-import { useToast } from '@/components/ui/use-toast'
+import { type Channel, type Message, type Platform } from '@/types'
 
 export default function DashboardPage() {
   const router = useRouter()
