@@ -64,7 +64,7 @@ graph TD
 
 ## 📊 Project Status
 
-✅ **Status:** Phase 1 Complete - Foundation Ready
+✅ **Status:** Phase 2 Complete - Core Features Ready
 
 ### Roadmap
 
@@ -74,11 +74,11 @@ graph TD
 - [x] Ontwikkel eerste MCP-connector (Slack)
 - [x] Basis authenticatie systeem
 
-#### Phase 2: Core Features (Q2 2025)
-- [ ] Outlook & Teams MCP-connectoren
-- [ ] Context Engine met AI-integratie
-- [ ] Unified messaging interface
-- [ ] Zoek- en filterfunctionaliteit
+#### Phase 2: Core Features (Q2 2025) ✅
+- [x] Outlook & Teams MCP-connectoren
+- [x] Context Engine met AI-integratie
+- [x] Unified messaging interface
+- [x] Zoek- en filterfunctionaliteit
 
 #### Phase 3: Enhancement (Q3 2025)
 - [ ] Geavanceerde AI-features (samenvatten, prioriteren)

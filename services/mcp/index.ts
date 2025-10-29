@@ -1,3 +1,5 @@
 export { BaseMCPConnector } from './base-connector'
 export { SlackMCPConnector, slackConnector } from './slack-connector'
+export { OutlookMCPConnector, outlookConnector } from './outlook-connector'
+export { TeamsMCPConnector, teamsConnector } from './teams-connector'
 export type { MCPConnector } from '@/types'

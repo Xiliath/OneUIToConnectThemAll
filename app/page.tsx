@@ -16,15 +16,16 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 mb-8">
           <h2 className="text-3xl font-semibold mb-6 text-gray-800 dark:text-white">
-            Welcome to Phase 1
+            Phase 2: Core Features Complete!
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
             OneUI is a universal interface that brings together Outlook, Teams, Slack,
-            and other communication platforms into one intuitive user experience.
+            and other communication platforms into one intuitive user experience with
+            AI-powered features.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <div className="border border-green-200 dark:border-green-700 rounded-lg p-6 bg-green-50 dark:bg-green-900/20">
               <div className="flex items-center mb-4">
                 <Slack className="w-8 h-8 text-blue-600 mr-3" />
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -36,7 +37,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 opacity-50">
+            <div className="border border-green-200 dark:border-green-700 rounded-lg p-6 bg-green-50 dark:bg-green-900/20">
               <div className="flex items-center mb-4">
                 <Mail className="w-8 h-8 text-blue-600 mr-3" />
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -44,11 +45,11 @@ export default function Home() {
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-300">
-                Coming in Phase 2
+                Access your emails and folders through the unified interface.
               </p>
             </div>
 
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 opacity-50">
+            <div className="border border-green-200 dark:border-green-700 rounded-lg p-6 bg-green-50 dark:bg-green-900/20">
               <div className="flex items-center mb-4">
                 <Users className="w-8 h-8 text-blue-600 mr-3" />
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -56,19 +57,19 @@ export default function Home() {
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-300">
-                Coming in Phase 2
+                View and manage Teams channels and messages.
               </p>
             </div>
 
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 opacity-50">
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
               <div className="flex items-center mb-4">
                 <MessageSquare className="w-8 h-8 text-blue-600 mr-3" />
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-                  More Platforms
+                  AI Features
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-300">
-                Extensible architecture for future integrations
+                AI-powered summaries, search, and filtering
               </p>
             </div>
           </div>
@@ -83,9 +84,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+        <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 mb-8">
           <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
-            Phase 1 - Foundation (Q1 2025)
+            Phase 1 - Foundation (Q1 2025) ✓
           </h3>
           <ul className="space-y-2 text-gray-600 dark:text-gray-300">
             <li className="flex items-center">
@@ -97,12 +98,36 @@ export default function Home() {
               Implement basic UI framework
             </li>
             <li className="flex items-center">
-              <span className="text-blue-500 mr-2">⧗</span>
+              <span className="text-green-500 mr-2">✓</span>
               Develop first MCP-connector (Slack)
             </li>
             <li className="flex items-center">
-              <span className="text-blue-500 mr-2">⧗</span>
+              <span className="text-green-500 mr-2">✓</span>
               Basic authentication system
+            </li>
+          </ul>
+        </div>
+
+        <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+          <h3 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
+            Phase 2 - Core Features (Q2 2025) ✓
+          </h3>
+          <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+            <li className="flex items-center">
+              <span className="text-green-500 mr-2">✓</span>
+              Outlook & Teams MCP-connectoren
+            </li>
+            <li className="flex items-center">
+              <span className="text-green-500 mr-2">✓</span>
+              Context Engine met AI-integratie
+            </li>
+            <li className="flex items-center">
+              <span className="text-green-500 mr-2">✓</span>
+              Unified messaging interface
+            </li>
+            <li className="flex items-center">
+              <span className="text-green-500 mr-2">✓</span>
+              Zoek- en filterfunctionaliteit
             </li>
           </ul>
         </div>
