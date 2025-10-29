@@ -44,9 +44,9 @@ graph TD
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework:** React/Next.js of Electron (te bepalen)
+- **Framework:** Next.js 14 with App Router
 - **UI Library:** Tailwind CSS + Shadcn/ui
-- **State Management:** Zustand of Redux Toolkit
+- **State Management:** Zustand with persistence
 - **Theming:** Custom theme engine met dark/light mode
 
 ### Backend & Integration
@@ -64,15 +64,15 @@ graph TD
 
 ## 📊 Project Status
 
-🚧 **Status:** Early Development / Concept Phase
+✅ **Status:** Phase 1 Complete - Foundation Ready
 
 ### Roadmap
 
-#### Phase 1: Foundation (Q1 2025)
-- [ ] Setup project architectuur
-- [ ] Implementeer basis UI framework
-- [ ] Ontwikkel eerste MCP-connector (Slack)
-- [ ] Basis authenticatie systeem
+#### Phase 1: Foundation (Q1 2025) ✅
+- [x] Setup project architectuur
+- [x] Implementeer basis UI framework
+- [x] Ontwikkel eerste MCP-connector (Slack)
+- [x] Basis authenticatie systeem
 
 #### Phase 2: Core Features (Q2 2025)
 - [ ] Outlook & Teams MCP-connectoren
@@ -102,14 +102,15 @@ Om met dit project te werken heb je nodig:
 - **Node.js** (v18 of hoger)
 - **npm** of **pnpm**
 - **Git**
+- **mkcert** (voor lokale HTTPS certificaten - [installatie instructies](https://github.com/FiloSottile/mkcert#installation))
 - API-toegang tot de platforms die je wilt integreren:
-  - Microsoft 365 account (voor Outlook/Teams)
-  - Slack workspace met admin rechten
-  - Claude API key (optioneel, voor AI-features)
+  - Slack workspace met admin rechten (vereist voor Phase 1)
+  - Microsoft 365 account (voor Outlook/Teams - Phase 2)
+  - Claude API key (optioneel, voor AI-features - Phase 3)
+
+> ⚠️ **Belangrijk:** Slack vereist HTTPS voor OAuth. We gebruiken mkcert voor lokale HTTPS ontwikkeling!
 
 ### Installatie
-
-> **Note:** Dit project is nog in de concept fase. Onderstaande instructies zijn voorbereid voor toekomstige implementatie.
 
 ```bash
 # Clone de repository
@@ -119,27 +120,145 @@ cd OneUIToConnectThemAll
 # Installeer dependencies
 npm install
 
+# Setup HTTPS certificaten voor lokale ontwikkeling
+# macOS/Linux:
+npm run setup-https
+
+# Windows:
+npm run setup-https:windows
+
 # Copy environment variabelen
 cp .env.example .env
 
 # Configureer je API keys in .env
 # SLACK_CLIENT_ID=your_slack_client_id
 # SLACK_CLIENT_SECRET=your_slack_client_secret
-# MICROSOFT_CLIENT_ID=your_microsoft_client_id
-# MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret
-# CLAUDE_API_KEY=your_claude_api_key
+# SLACK_SIGNING_SECRET=your_slack_signing_secret
+# SLACK_REDIRECT_URI=https://localhost:3000/api/auth/slack/callback
+# NEXT_PUBLIC_APP_URL=https://localhost:3000
 
-# Start development server
+# Start development server (nu met HTTPS!)
 npm run dev
+```
+
+De applicatie is nu beschikbaar op [https://localhost:3000](https://localhost:3000)
+
+**Note:** De `setup-https` script installeert mkcert en genereert lokale SSL certificaten. Je browser zal deze automatisch vertrouwen!
+
+### Slack App Setup
+
+Om Slack te integreren heb je een Slack App nodig:
+
+#### Stap 1: Configureer Slack App
+
+1. Ga naar [https://api.slack.com/apps](https://api.slack.com/apps)
+2. Klik op "Create New App" en kies "From scratch"
+3. Geef je app een naam en selecteer je workspace
+4. Ga naar "OAuth & Permissions" en voeg deze scopes toe onder **User Token Scopes**:
+   - `channels:history`
+   - `channels:read`
+   - `chat:write`
+   - `users:read`
+   - `groups:read`
+   - `groups:history`
+5. Voeg de redirect URL toe: `https://localhost:3000/api/auth/slack/callback`
+   - ⚠️ **Belangrijk:** Gebruik exact `https://localhost:3000`, niet `http://`!
+6. Kopieer je **Client ID**, **Client Secret**, en **Signing Secret** naar je `.env` bestand
+
+#### Stap 2: Test de integratie
+
+1. Zorg dat je HTTPS certificaten zijn gegenereerd: `npm run setup-https`
+2. Start de development server: `npm run dev`
+3. Ga naar [https://localhost:3000](https://localhost:3000)
+4. Klik op "Go to Dashboard"
+5. Klik op "Connect Slack"
+6. Autoriseer de app in je Slack workspace
+7. Je wordt teruggeleid naar het dashboard waar je channels kunt zien
+
+**Note:** Je browser zal de HTTPS verbinding vertrouwen omdat mkcert een lokale CA installeert!
+
+### Project Structuur
+
+```
+OneUIToConnectThemAll/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   │   └── auth/         # OAuth handlers
+│   ├── dashboard/        # Dashboard page
+│   ├── globals.css       # Global styles
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Home page
+├── components/            # React components
+│   ├── ui/               # UI components (Button, Card, etc.)
+│   ├── message-list.tsx  # Message display
+│   └── sidebar.tsx       # Channel sidebar
+├── lib/                   # Utilities
+│   ├── store.ts          # Zustand state management
+│   └── utils.ts          # Helper functions
+├── services/              # Business logic
+│   ├── auth/             # OAuth service
+│   └── mcp/              # MCP connectors
+├── types/                 # TypeScript types
+│   └── index.ts          # Type definitions
+└── __tests__/            # Jest tests
 ```
 
 ---
 
 ## 💡 Usage
 
-> **Note:** Gebruik voorbeelden worden toegevoegd zodra de eerste implementatie gereed is.
+### Phase 1 Features
 
-### Geplande functionaliteit:
+**Slack Integration:**
+1. Start de development server met `npm run dev`
+2. Ga naar [http://localhost:3000](http://localhost:3000)
+3. Klik op "Go to Dashboard"
+4. Klik op "Connect Slack"
+5. Autoriseer de app in je Slack workspace
+6. Bekijk je channels en berichten in de unified interface
+
+### Development
+
+```bash
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Lint code
+npm run lint
+```
+
+### Gebruik van de MCP Connectors
+
+```typescript
+import { slackConnector } from '@/services/mcp'
+
+// Connect to Slack
+slackConnector.setAccessToken('your-access-token')
+await slackConnector.connect()
+
+// Get channels
+const channels = await slackConnector.getChannels()
+
+// Get messages
+const messages = await slackConnector.getMessages('channel-id', 50)
+
+// Send message
+const newMessage = await slackConnector.sendMessage('channel-id', 'Hello!')
+```
+
+### Geplande functionaliteit (Phase 2+):
 
 ```javascript
 // Voorbeeld: Berichten ophalen van alle platforms
@@ -155,6 +274,56 @@ const summary = await oneUI.summarizeThread(threadId, {
   style: 'concise'
 });
 ```
+
+---
+
+## 🔧 Troubleshooting
+
+### HTTPS Certificate Issues
+
+**Problem:** Browser shows "Your connection is not private"
+- **Oplossing:** Run `npm run setup-https` om mkcert te installeren en certificaten te genereren
+- Controleer of mkcert correct is geïnstalleerd: `mkcert -version`
+- Run `mkcert -install` om de lokale CA te installeren
+- Herstart je browser na het installeren van de CA
+
+**Problem:** "ENOENT: no such file or directory" error bij het starten
+- **Oplossing:** Je hebt de HTTPS certificaten nog niet gegenereerd
+- Run `npm run setup-https` (macOS/Linux) of `npm run setup-https:windows` (Windows)
+- Controleer of de files bestaan in de `certificates/` directory
+
+**Problem:** mkcert command not found
+- **Oplossing:** Installeer mkcert:
+  - **macOS:** `brew install mkcert`
+  - **Linux:** Zie [mkcert installation guide](https://github.com/FiloSottile/mkcert#linux)
+  - **Windows:** `choco install mkcert` of `scoop install mkcert`
+
+### Slack OAuth Issues
+
+**Problem:** "The redirect_uri is invalid"
+- **Oplossing:** Controleer of je exact `https://localhost:3000/api/auth/slack/callback` hebt gebruikt
+- Zorg dat je HTTPS gebruikt, niet HTTP
+- Herstart je Next.js server na het wijzigen van `.env`
+
+**Problem:** OAuth callback werkt niet
+- **Oplossing:**
+  - Zorg dat `NEXT_PUBLIC_APP_URL` in `.env` is ingesteld op `https://localhost:3000`
+  - Controleer de browser console en server logs voor errors
+  - Verifieer dat je development server draait op `https://localhost:3000`
+
+**Problem:** "Can't connect" of "SSL protocol error"
+- **Oplossing:**
+  - Controleer of de certificaten correct zijn gegenereerd in `certificates/`
+  - Herstart je development server
+  - Probeer je browser cache te wissen
+
+### Voor Production
+
+Voor production deployments (Vercel, Netlify, etc.):
+- Gebruik je productie domein HTTPS URL
+- Update de redirect URI in je Slack app configuratie naar je productie URL
+- Update `NEXT_PUBLIC_APP_URL` in je environment variabelen
+- Je hebt geen mkcert certificaten nodig in productie (de hosting provider regelt HTTPS)
 
 ---
 
