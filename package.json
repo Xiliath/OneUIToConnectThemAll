@@ -4,12 +4,15 @@
   "private": true,
   "description": "Universal interface to unify Outlook, Teams, Slack and other communication platforms",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
+    "dev:http": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "setup-https": "bash scripts/setup-https.sh",
+    "setup-https:windows": "powershell -ExecutionPolicy Bypass -File scripts/setup-https.ps1"
   },
   "dependencies": {
     "next": "^14.0.4",

@@ -102,13 +102,13 @@ Om met dit project te werken heb je nodig:
 - **Node.js** (v18 of hoger)
 - **npm** of **pnpm**
 - **Git**
-- **ngrok** (voor lokale Slack OAuth - [download hier](https://ngrok.com/download))
+- **mkcert** (voor lokale HTTPS certificaten - [installatie instructies](https://github.com/FiloSottile/mkcert#installation))
 - API-toegang tot de platforms die je wilt integreren:
   - Slack workspace met admin rechten (vereist voor Phase 1)
   - Microsoft 365 account (voor Outlook/Teams - Phase 2)
   - Claude API key (optioneel, voor AI-features - Phase 3)
 
-> ⚠️ **Belangrijk:** Slack vereist HTTPS voor OAuth. Gebruik ngrok voor lokale ontwikkeling!
+> ⚠️ **Belangrijk:** Slack vereist HTTPS voor OAuth. We gebruiken mkcert voor lokale HTTPS ontwikkeling!
 
 ### Installatie
 
@@ -120,6 +120,13 @@ cd OneUIToConnectThemAll
 # Installeer dependencies
 npm install
 
+# Setup HTTPS certificaten voor lokale ontwikkeling
+# macOS/Linux:
+npm run setup-https
+
+# Windows:
+npm run setup-https:windows
+
 # Copy environment variabelen
 cp .env.example .env
 
@@ -127,39 +134,22 @@ cp .env.example .env
 # SLACK_CLIENT_ID=your_slack_client_id
 # SLACK_CLIENT_SECRET=your_slack_client_secret
 # SLACK_SIGNING_SECRET=your_slack_signing_secret
-# SLACK_REDIRECT_URI=https://your-ngrok-url.ngrok.io/api/auth/slack/callback
-# NEXT_PUBLIC_APP_URL=https://your-ngrok-url.ngrok.io
+# SLACK_REDIRECT_URI=https://localhost:3000/api/auth/slack/callback
+# NEXT_PUBLIC_APP_URL=https://localhost:3000
 
-# Start development server
+# Start development server (nu met HTTPS!)
 npm run dev
-
-# In een andere terminal, start ngrok (voor Slack OAuth)
-npx ngrok http 3000
 ```
 
-**Note:** Voor lokale ontwikkeling met Slack OAuth moet je ngrok gebruiken omdat Slack HTTPS vereist voor redirect URLs. Zie de "Slack App Setup" sectie hieronder voor meer details.
+De applicatie is nu beschikbaar op [https://localhost:3000](https://localhost:3000)
+
+**Note:** De `setup-https` script installeert mkcert en genereert lokale SSL certificaten. Je browser zal deze automatisch vertrouwen!
 
 ### Slack App Setup
 
 Om Slack te integreren heb je een Slack App nodig:
 
-**Belangrijke Note:** Slack vereist HTTPS voor OAuth redirect URLs. Voor lokale ontwikkeling moet je een tunneling service zoals ngrok gebruiken.
-
-#### Stap 1: Setup ngrok (voor local development)
-
-```bash
-# Installeer ngrok (https://ngrok.com/)
-# Start je Next.js app
-npm run dev
-
-# In een nieuwe terminal, start ngrok
-ngrok http 3000
-
-# Ngrok geeft je een HTTPS URL, bijvoorbeeld: https://abc123.ngrok.io
-# Gebruik deze URL in de volgende stappen
-```
-
-#### Stap 2: Configureer Slack App
+#### Stap 1: Configureer Slack App
 
 1. Ga naar [https://api.slack.com/apps](https://api.slack.com/apps)
 2. Klik op "Create New App" en kies "From scratch"
@@ -171,20 +161,21 @@ ngrok http 3000
    - `users:read`
    - `groups:read`
    - `groups:history`
-5. Voeg de redirect URL toe: `https://your-ngrok-url.ngrok.io/api/auth/slack/callback`
-   - ⚠️ **Belangrijk:** Gebruik HTTPS, niet HTTP!
-   - Vervang `your-ngrok-url.ngrok.io` met je echte ngrok URL
+5. Voeg de redirect URL toe: `https://localhost:3000/api/auth/slack/callback`
+   - ⚠️ **Belangrijk:** Gebruik exact `https://localhost:3000`, niet `http://`!
 6. Kopieer je **Client ID**, **Client Secret**, en **Signing Secret** naar je `.env` bestand
-7. Update `SLACK_REDIRECT_URI` en `NEXT_PUBLIC_APP_URL` in `.env` met je ngrok URL
-8. Herstart je Next.js server om de nieuwe environment variabelen te laden
 
-#### Stap 3: Test de integratie
+#### Stap 2: Test de integratie
 
-1. Ga naar je ngrok URL (bijv. `https://abc123.ngrok.io`)
-2. Klik op "Go to Dashboard"
-3. Klik op "Connect Slack"
-4. Autoriseer de app in je Slack workspace
-5. Je wordt teruggeleid naar het dashboard waar je channels kunt zien
+1. Zorg dat je HTTPS certificaten zijn gegenereerd: `npm run setup-https`
+2. Start de development server: `npm run dev`
+3. Ga naar [https://localhost:3000](https://localhost:3000)
+4. Klik op "Go to Dashboard"
+5. Klik op "Connect Slack"
+6. Autoriseer de app in je Slack workspace
+7. Je wordt teruggeleid naar het dashboard waar je channels kunt zien
+
+**Note:** Je browser zal de HTTPS verbinding vertrouwen omdat mkcert een lokale CA installeert!
 
 ### Project Structuur
 
@@ -288,36 +279,51 @@ const summary = await oneUI.summarizeThread(threadId, {
 
 ## 🔧 Troubleshooting
 
+### HTTPS Certificate Issues
+
+**Problem:** Browser shows "Your connection is not private"
+- **Oplossing:** Run `npm run setup-https` om mkcert te installeren en certificaten te genereren
+- Controleer of mkcert correct is geïnstalleerd: `mkcert -version`
+- Run `mkcert -install` om de lokale CA te installeren
+- Herstart je browser na het installeren van de CA
+
+**Problem:** "ENOENT: no such file or directory" error bij het starten
+- **Oplossing:** Je hebt de HTTPS certificaten nog niet gegenereerd
+- Run `npm run setup-https` (macOS/Linux) of `npm run setup-https:windows` (Windows)
+- Controleer of de files bestaan in de `certificates/` directory
+
+**Problem:** mkcert command not found
+- **Oplossing:** Installeer mkcert:
+  - **macOS:** `brew install mkcert`
+  - **Linux:** Zie [mkcert installation guide](https://github.com/FiloSottile/mkcert#linux)
+  - **Windows:** `choco install mkcert` of `scoop install mkcert`
+
 ### Slack OAuth Issues
 
 **Problem:** "The redirect_uri is invalid"
-- **Oplossing:** Controleer of je HTTPS gebruikt in je redirect URI (niet HTTP)
-- Zorg dat je ngrok URL exact overeenkomt met wat je in Slack hebt geconfigureerd
+- **Oplossing:** Controleer of je exact `https://localhost:3000/api/auth/slack/callback` hebt gebruikt
+- Zorg dat je HTTPS gebruikt, niet HTTP
 - Herstart je Next.js server na het wijzigen van `.env`
 
 **Problem:** OAuth callback werkt niet
-- **Oplossing:** Controleer of ngrok nog actief is (ngrok sessies verlopen na een tijdje in de gratis versie)
-- Zorg dat `NEXT_PUBLIC_APP_URL` in `.env` overeenkomt met je ngrok URL
-- Controleer de browser console en server logs voor errors
+- **Oplossing:**
+  - Zorg dat `NEXT_PUBLIC_APP_URL` in `.env` is ingesteld op `https://localhost:3000`
+  - Controleer de browser console en server logs voor errors
+  - Verifieer dat je development server draait op `https://localhost:3000`
 
-**Problem:** "This site can't be reached" bij ngrok URL
-- **Oplossing:** Zorg dat beide servers draaien:
-  - Terminal 1: `npm run dev` (Next.js server op poort 3000)
-  - Terminal 2: `ngrok http 3000` (ngrok tunnel)
-
-**Problem:** CORS errors
-- **Oplossing:** Ngrok's gratis tier kan soms CORS issues veroorzaken. Probeer:
-  - Je ngrok sessie opnieuw te starten
-  - Een andere ngrok URL te gebruiken
-  - Je browser cache te wissen
+**Problem:** "Can't connect" of "SSL protocol error"
+- **Oplossing:**
+  - Controleer of de certificaten correct zijn gegenereerd in `certificates/`
+  - Herstart je development server
+  - Probeer je browser cache te wissen
 
 ### Voor Production
 
 Voor production deployments (Vercel, Netlify, etc.):
-- Gebruik je productie domein in plaats van ngrok
-- Zorg dat je domein HTTPS ondersteunt
-- Update de redirect URI in je Slack app configuratie
+- Gebruik je productie domein HTTPS URL
+- Update de redirect URI in je Slack app configuratie naar je productie URL
 - Update `NEXT_PUBLIC_APP_URL` in je environment variabelen
+- Je hebt geen mkcert certificaten nodig in productie (de hosting provider regelt HTTPS)
 
 ---
 
