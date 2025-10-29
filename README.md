@@ -177,6 +177,127 @@ Om Slack te integreren heb je een Slack App nodig:
 
 **Note:** Je browser zal de HTTPS verbinding vertrouwen omdat mkcert een lokale CA installeert!
 
+---
+
+### Microsoft Teams & Outlook Setup (Phase 2)
+
+Om Teams en Outlook te integreren heb je een Microsoft Azure App Registration nodig:
+
+#### Stap 1: Maak een Azure App Registration
+
+1. Ga naar [Azure Portal](https://portal.azure.com/)
+2. Navigeer naar **Azure Active Directory** > **App registrations**
+3. Klik op **New registration**
+4. Vul de volgende gegevens in:
+   - **Name:** OneUI (of een andere naam naar keuze)
+   - **Supported account types:** Accounts in any organizational directory and personal Microsoft accounts
+   - **Redirect URI:**
+     - Platform: **Web**
+     - URI: `https://localhost:3000/api/auth/microsoft/callback`
+5. Klik op **Register**
+
+#### Stap 2: Configureer API Permissions
+
+1. Ga naar **API permissions** in je app registration
+2. Klik op **Add a permission**
+3. Selecteer **Microsoft Graph**
+4. Kies **Delegated permissions** en voeg toe:
+
+   **Voor Teams:**
+   - `User.Read`
+   - `Chat.Read`
+   - `Chat.ReadWrite`
+   - `ChannelMessage.Read.All`
+   - `Team.ReadBasic.All`
+   - `Channel.ReadBasic.All`
+
+   **Voor Outlook:**
+   - `User.Read`
+   - `Mail.Read`
+   - `Mail.ReadWrite`
+   - `Mail.Send`
+   - `MailboxSettings.Read`
+
+5. Klik op **Add permissions**
+6. Klik op **Grant admin consent** (optioneel maar aanbevolen voor testen)
+
+#### Stap 3: Genereer Client Secret
+
+1. Ga naar **Certificates & secrets**
+2. Klik op **New client secret**
+3. Geef een beschrijving (bijv. "OneUI Development")
+4. Kies een expiration period (6 months, 12 months, of 24 months)
+5. Klik op **Add**
+6. **⚠️ Belangrijk:** Kopieer de **Value** direct! Deze wordt later niet meer getoond
+
+#### Stap 4: Configureer Environment Variables
+
+Voeg de volgende variabelen toe aan je `.env` bestand:
+
+```env
+# Microsoft Configuration
+MICROSOFT_CLIENT_ID=your_application_client_id
+MICROSOFT_CLIENT_SECRET=your_client_secret_value
+MICROSOFT_REDIRECT_URI=https://localhost:3000/api/auth/microsoft/callback
+```
+
+Je kunt de **Client ID** (Application ID) vinden op de Overview pagina van je app registration.
+
+#### Stap 5: Test de integratie
+
+1. Start de development server: `npm run dev`
+2. Ga naar [https://localhost:3000/dashboard](https://localhost:3000/dashboard)
+3. Klik op **Teams** of **Outlook** onder "Platforms"
+4. Log in met je Microsoft account
+5. Accepteer de gevraagde permissions
+6. Je wordt teruggeleid naar het dashboard waar je je Teams channels of Outlook folders ziet
+
+**Tips:**
+- Voor Teams: Je ziet alleen teams waar je lid van bent
+- Voor Outlook: Je ziet je mail folders (Inbox, Sent Items, etc.)
+- Je kunt meerdere platforms tegelijk verbinden!
+
+---
+
+### AI Features Setup (Phase 2)
+
+Om AI-powered features te gebruiken (zoals message summarization):
+
+#### Stap 1: Verkrijg Claude API Key
+
+1. Ga naar [Anthropic Console](https://console.anthropic.com/)
+2. Maak een account aan of log in
+3. Navigeer naar **API Keys**
+4. Klik op **Create Key**
+5. Geef je key een naam (bijv. "OneUI Development")
+6. Kopieer de API key
+
+#### Stap 2: Configureer Environment Variable
+
+Voeg toe aan je `.env` bestand:
+
+```env
+# Claude API (voor AI features)
+CLAUDE_API_KEY=sk-ant-api03-...your-api-key
+```
+
+#### Stap 3: Gebruik AI Features
+
+1. Selecteer een channel met berichten in het dashboard
+2. Klik op de **AI Summary** knop (met ✨ icoon)
+3. Wacht terwijl de AI een samenvatting genereert
+4. De samenvatting verschijnt in een popup
+
+**AI Features:**
+- **Message Summarization:** Vat conversatie threads samen
+- **Smart Search:** Zoek door alle berichten van alle platforms tegelijk
+- **Platform Filtering:** Filter berichten per platform
+- **Sort & Organize:** Sorteer berichten op datum
+
+**Note:** AI features vereisen een werkende Claude API key. Zonder API key kun je nog steeds alle andere features gebruiken, maar de AI Summary knop zal een foutmelding geven.
+
+---
+
 ### Project Structuur
 
 ```
@@ -207,15 +328,56 @@ OneUIToConnectThemAll/
 
 ## 💡 Usage
 
-### Phase 1 Features
+### Quick Start Guide
 
-**Slack Integration:**
-1. Start de development server met `npm run dev`
-2. Ga naar [http://localhost:3000](http://localhost:3000)
-3. Klik op "Go to Dashboard"
-4. Klik op "Connect Slack"
-5. Autoriseer de app in je Slack workspace
-6. Bekijk je channels en berichten in de unified interface
+1. **Start de development server:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Open de applicatie:**
+   - Ga naar [https://localhost:3000](https://localhost:3000)
+   - Klik op "Go to Dashboard"
+
+3. **Verbind je platforms:**
+   - **Slack:** Klik op "Slack" button, autoriseer in je workspace
+   - **Teams:** Klik op "Teams" button, log in met Microsoft account
+   - **Outlook:** Klik op "Outlook" button, log in met Microsoft account
+
+4. **Gebruik de unified interface:**
+   - Selecteer een channel/folder uit de sidebar
+   - Bekijk berichten van alle platforms in één interface
+   - Gebruik de zoekbalk om door alle berichten te zoeken
+   - Filter op platform met de dropdown
+   - Klik op "AI Summary" voor een AI-gegenereerde samenvatting
+
+### Phase 2 Features (Current)
+
+**Multi-Platform Integration:**
+- Connect Slack, Microsoft Teams, en Outlook
+- Bekijk alle channels en folders in één sidebar
+- Switch naadloos tussen platforms
+
+**Unified Messaging:**
+- Alle berichten in één consistent format
+- Real-time search door alle platforms
+- Filter op platform, sorteer op datum
+- Zie metadata zoals author, timestamp, en platform badge
+
+**AI-Powered Features:**
+- Automatische message summarization
+- Context-aware analysis
+- Smart search en filtering
+
+**Hoe te gebruiken:**
+```javascript
+// Berichten van alle platforms worden automatisch samengevoegd
+// Gebruik de search bar om te zoeken:
+"bug fix" // Zoekt in alle berichten van alle platforms
+
+// Filter op specifiek platform via dropdown
+// Sorteer op "Newest First" of "Oldest First"
+```
 
 ### Development
 
